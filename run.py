@@ -1,37 +1,62 @@
-import gspread
-from google.oauth2.service_account import Credentials
+import random
+from words import word_list
+import string
+import os
 
-SCOPE = [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive.file",
-    "https://www.googleapis.com/auth/drive"
-    ]
-
-CREDS = Credentials.from_service_account_file('creds.json')
-SCOPED_CREDS = CREDS.with_scopes(SCOPE)
-GSPREAD_CLIENT = gspread.authorize(SCOPED_CREDS)
-SHEET = GSPREAD_CLIENT.open('test')
-
-user = SHEET.worksheet('user')
+def get_word(word_list):
+    words = random.choice(word_list)
+    return words.upper()
 
 
-def get_info():
-    """ Get user info
+def clear_screen():
     """
-    data_str = input("Enter your data here? \n")
-    print((f"The data provided is {data_str}"))
-    return data_str
-
-
-def update_user_worksheet(data):
+    Clear the console.
+    numlines is an optional argument used only as a fall-back.
     """
-    Update user worksheet
-    """
-    print("Updating sales worksheet....\n")
-    user_worksheet = SHEET.worksheet("user")
-    user_worksheet.append_row(data)
+    if os.name == "posix":
+        # Unix/Linux/MacOS/BSD/etc
+        os.system('clear')
+    elif os.name in ("nt", "dos", "ce"):
+        # DOS/Windows
+        os.system('CLS')
+    else:
+        # Fallback for other operating systems.
+        print('\n' * numlines)
 
 
-data = get_info()
+def game(word_list):
+    word = get_word(word_list)
+    letter_word = set(word)
+    abc = set(string.ascii_uppercase)
+    used_letters = set()
+    life = 5
+    while len(letter_word) > 0 and life > 0:
+        print(f'you have {life} lives left')
+        print(f'you used these:', ' '.join(used_letters))
+        list_of_words = [letter if letter in used_letters else ('-') for letter in word]
+        print(f'Current word:', ' '.join(list_of_words))
+        player_letter = input("Guess letter? \n").upper()
+        if player_letter in abc - used_letters:
+            used_letters.add(player_letter)
+            if player_letter in letter_word:
+                clear_screen()
+                letter_word.remove(player_letter)
+            else:
+                clear_screen()
+                life -= 1
+                print('letter is not in the word')
+        elif player_letter in used_letters:
+            clear_screen()
+            print('Already used that letter')
+        else:
+            clear_screen()
+            print('please try again, with letter')
+    if life == 0:
+        clear_screen()
+        print('You lost the game.')
+    else:
+        clear_screen()
+        print('Well done, you won')
 
-update_user_worksheet(data)
+
+game(word_list)
