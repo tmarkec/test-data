@@ -30,6 +30,33 @@ def game(word_list):
     abc = set(string.ascii_uppercase)
     used_letters = set()
     life = 5
-    
+    while len(letter_word) > 0 and life > 0:
+        print(f'you have {life} lives left')
+        print(f'you used these:', ' '.join(used_letters))
+        list_of_words = [letter if letter in used_letters else ('-') for letter in word]
+        print(f'Current word:', ' '.join(list_of_words))
+        player_letter = input("Guess letter? \n").upper()
+        if player_letter in abc - used_letters:
+            used_letters.add(player_letter)
+            if player_letter in letter_word:
+                clear_screen()
+                letter_word.remove(player_letter)
+            else:
+                clear_screen()
+                life -= 1
+                print('letter is not in the word')
+        elif player_letter in used_letters:
+            clear_screen()
+            print('Already used that letter')
+        else:
+            clear_screen()
+            print('please try again, with letter')
+    if life == 0:
+        clear_screen()
+        print('You lost the game.')
+    else:
+        clear_screen()
+        print('Well done, you won')
+
 
 game(word_list)
