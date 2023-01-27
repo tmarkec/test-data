@@ -21,10 +21,9 @@ SCOPED_CREDS = CREDS.with_scopes(SCOPE)
 GSPREAD_CLIENT = gspread.authorize(SCOPED_CREDS)
 SHEET = GSPREAD_CLIENT.open('test')
 
-leaders = SHEET.worksheet('leaderboard')
+leaders = SHEET.worksheet('user')
 
-date = leaders.get_all_values()
-print(data)
+
 def welcome_screen():
     """
     Function to welcome screen which will provide user
@@ -177,12 +176,14 @@ def game():
     loose all lives.
     """
     clear()
+    global score
     word = get_word()
     hidden_word = set(word)
     letter_alphab = set(string.ascii_uppercase)
     used_letters = set()
     tries = lives
     points = 0
+    score = 0
     while len(hidden_word) > 0 and tries > 0:
         letter_words = \
             [letter if letter in used_letters else '-' for letter in word]
@@ -222,6 +223,7 @@ def game():
         print('The word we were looking for was:'.center(width))
         print(f"{Fore.YELLOW + Style.BRIGHT} {word}".center(width))
         print(hangman_as[tries])
+        update_leaderboard()
         end_game()
 
     else:
@@ -230,6 +232,7 @@ def game():
         print(score)
         text_win = pyfiglet.figlet_format(f'Well done {name}, you won!')
         print(text_win)
+        update_leaderboard()
         end_game()
 
 
@@ -251,6 +254,9 @@ def end_game():
                 clear()
                 thank_you()
                 break
+            elif again == "L":
+                leader_board()
+                break
             else:
                 raise ValueError('\nYou must type Y or N.'.center(width))
         except ValueError as e_rr:
@@ -265,6 +271,17 @@ def thank_you():
     thank_text = pyfiglet.figlet_format(f'Thank you for playing game {name}!')
     print(thank_text)
 
+
+def update_leaderboard():
+
+    update = [name, score]
+    leaders.insert_row(update, 2)
+
+
+def leader_board():
+    leaders.sort()
+    data = leaders.get('A1:B4')
+    print(data)
 
 if __name__ == '__main__':
     welcome_screen()
