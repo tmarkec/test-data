@@ -3,12 +3,14 @@ import string
 import os
 import pyfiglet
 import gspread
+import datetime
 from google.oauth2.service_account import Credentials
 from colorama import Fore, init, Style
 from hangman import hangman_as
 from words import word_list
 init(autoreset=True)
 width = os.get_terminal_size().columns
+
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -22,6 +24,7 @@ GSPREAD_CLIENT = gspread.authorize(SCOPED_CREDS)
 SHEET = GSPREAD_CLIENT.open('test')
 
 leaders = SHEET.worksheet('user')
+date = datetime.datetime.now().strftime("%d-%m-%Y")
 
 
 def welcome_screen():
@@ -241,9 +244,10 @@ def end_game():
     Function that will ask user if he wants to play again.
     """
     while True:
-        print(f"{Fore.RED + Style.BRIGHT} Would you like to play"
-              "again?\n".center(width))
-        again = input('Y/N?\n'.center(width)).upper()
+        print(f"{Fore.GREEN + Style.BRIGHT} {name} you can play"
+              " again or not or you can just check our scoreboard\n".center(
+                width))
+        again = input('Press (Y)es, (N)o or (S)core\n'.center(width)).upper()
         try:
             if again == 'Y':
                 clear()
@@ -254,11 +258,11 @@ def end_game():
                 clear()
                 thank_you()
                 break
-            elif again == "L":
+            elif again == "S":
                 leader_board()
                 break
             else:
-                raise ValueError('\nYou must type Y or N.'.center(width))
+                raise ValueError('\nYou must type Y,N or S!!!'.center(width))
         except ValueError as e_rr:
             print(Fore.RED + (f'Try again: {e_rr}'))
 
@@ -274,14 +278,31 @@ def thank_you():
 
 def update_leaderboard():
 
-    update = [name, score]
-    leaders.insert_row(update, 2)
+    update = [name, score, date]
+    leaders.insert_row(update, 3)
 
 
 def leader_board():
+    clear()
     leaders.sort()
-    data = leaders.get('A1:B4')
+    data = leaders.get("A2:C7")
     print(data)
+    while True:
+        print("\n")
+        print(Fore.GREEN
+              + Style.BRIGHT
+              + "Hope you are happy with your score, now lets get you back!")
+        print("\n")
+        back = input("Press (B)ack!!".center(width)).upper()
+        try:
+            if back == 'B':
+                end_game()
+                break
+            else:
+                raise ValueError('\nYou must type B!!!'.center(width))
+        except ValueError as e_rr:
+            print(Fore.RED + (f'Try again: {e_rr}'))
+
 
 if __name__ == '__main__':
     welcome_screen()
