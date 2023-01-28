@@ -311,7 +311,7 @@ def leader_board():
     Function to display scores
     """
     clear()
-    leaders.sort((3, 'asc'))
+    leaders.sort((2, 'des'))
     data = leaders.get("A2:C7")
     # print(data)
     print(tabulate(data, headers=['name', 'score', 'date']))
