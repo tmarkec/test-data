@@ -5,6 +5,7 @@ import pyfiglet
 import gspread
 import datetime
 from google.oauth2.service_account import Credentials
+from tabulate import tabulate
 from colorama import Fore, init, Style
 from hangman import hangman_as
 from words import word_list
@@ -207,34 +208,53 @@ def game():
             if user_guess in hidden_word:
                 hidden_word.remove(user_guess)
                 points += 1
-                print(f'you got {points}')
+                print(f'{Fore.WHITE + Style.BRIGHT}Your score: {points}')
             else:
                 tries -= 1
                 points -= 1
-                print(f'you got {points}')
                 print(Fore.RED + 'Your guess is not in the word,'
                                  'try again!'.center(width))
+                print(f'{Fore.WHITE + Style.BRIGHT}Your score: {points}')
         elif user_guess in used_letters:
             print(Fore.YELLOW + 'You used this letter already,'
                                 'try again'.center(width))
+            print(f'{Fore.WHITE + Style.BRIGHT}Your score: {points}')
         else:
             print(Fore.RED + 'Unrecognized character'
                              ' try again with letter!'.center(width))
+            print(f'{Fore.WHITE + Style.BRIGHT}Your score: {points}')
     if tries == 0:
         clear()
-        print(Fore.RED + (f'Sorry {name} you lost!!!\n').center(width))
+        print(Fore.RED + (f'Sorry {name} you lost!!!').center(width))
         print('The word we were looking for was:'.center(width))
         print(f"{Fore.YELLOW + Style.BRIGHT} {word}".center(width))
         print(hangman_as[tries])
+        print(f"{Fore.WHITE + Style.BRIGHT}Your score was: {score}".center(
+            width))
         update_leaderboard()
         end_game()
 
     else:
         clear()
         score = points + 10
-        print(score)
-        text_win = pyfiglet.figlet_format(f'Well done {name}, you won!')
-        print(text_win)
+        print(Fore.BLUE
+              + Style.BRIGHT + (f" Well done {name}, you won!").center(width))
+        print(
+            """
+                                   .-''.
+                                  /    \\
+                             ')  || '/' | (`
+                              \\  \\`_.' //
+                               \\.-`--'.//
+                                 Y .  .Y
+                                 | . .|
+                                 |    |
+                                 ||'||
+                                 || ||
+                             __/ | | \\__
+        """)
+        print(f"{Fore.WHITE + Style.BRIGHT}Your score was: {score}".center(
+            width))
         update_leaderboard()
         end_game()
 
@@ -259,6 +279,7 @@ def end_game():
                 thank_you()
                 break
             elif again == "S":
+                clear()
                 leader_board()
                 break
             else:
@@ -277,16 +298,23 @@ def thank_you():
 
 
 def update_leaderboard():
+    """
+    Function to update data
+    """
 
     update = [name, score, date]
     leaders.insert_row(update, 3)
 
 
 def leader_board():
+    """
+    Function to display scores
+    """
     clear()
-    leaders.sort()
+    leaders.sort((3, 'asc'))
     data = leaders.get("A2:C7")
-    print(data)
+    # print(data)
+    print(tabulate(data, headers=['name', 'score', 'date']))
     while True:
         print("\n")
         print(Fore.GREEN
@@ -296,12 +324,14 @@ def leader_board():
         back = input("Press (B)ack!!".center(width)).upper()
         try:
             if back == 'B':
+                clear()
                 end_game()
                 break
             else:
                 raise ValueError('\nYou must type B!!!'.center(width))
         except ValueError as e_rr:
             print(Fore.RED + (f'Try again: {e_rr}'))
+    clear()
 
 
 if __name__ == '__main__':
