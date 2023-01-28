@@ -24,7 +24,7 @@ SCOPED_CREDS = CREDS.with_scopes(SCOPE)
 GSPREAD_CLIENT = gspread.authorize(SCOPED_CREDS)
 SHEET = GSPREAD_CLIENT.open('test')
 
-leaders = SHEET.worksheet('user')
+leaders = SHEET.worksheet('user2')
 date = datetime.datetime.now().strftime("%d-%m-%Y")
 
 
